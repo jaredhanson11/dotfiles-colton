@@ -91,6 +91,7 @@
         Plug 'mattn/emmet-vim'
         Plug 'Shutnik/jshint2.vim'
         Plug 'skammer/vim-css-color'
+        Plug 'mxw/vim-jsx'
 
         " Other filetype stuff
         Plug 'wlangstroth/vim-racket', { 'for': 'racket' }
