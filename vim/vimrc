@@ -61,7 +61,7 @@
         " Project navigation
         Plug 'kien/ctrlp.vim'
         Plug 'jistr/vim-nerdtree-tabs'
-        Plug 'scrooloose/nerdtree', { 'on':  ['NERDTreeToggle', 'NERDTreeFind'] }
+        Plug 'scrooloose/nerdtree'
         Plug 'basepi/netrw'
 
         " Buffer management
@@ -685,8 +685,6 @@ end
 """"""""""""""""""""""""""""""
 "  If directory was given as vim startup argument, open NerdTreeTabToggle
     let g:nerdtree_tabs_open_on_console_startup = 2
-" Close after opening a file
-    let NERDTreeQuitOnOpen = 1
 
 " Use NerdTreeFind by default for toggle
     function! NERDTreeToggleInCurDir()
