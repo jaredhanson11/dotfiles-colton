@@ -60,16 +60,22 @@
 
         " Project navigation
         Plug 'kien/ctrlp.vim'
-        Plug 'scrooloose/nerdtree'
         Plug 'jistr/vim-nerdtree-tabs'
+        Plug 'scrooloose/nerdtree', { 'on':  ['NERDTreeToggle', 'NERDTreeFind'] }
+        Plug 'basepi/netrw'
 
         " Buffer management
         Plug 'vim-scripts/bufexplorer.zip'
+
+        " Rename file support
+        Plug 'vim-scripts/Rename2'
 
         " Search
         "Plug 'haya14busa/incsearch-easymotion.vim'
         Plug 'haya14busa/incsearch-fuzzy.vim'
         Plug 'haya14busa/incsearch.vim'
+        Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+        Plug 'Alok/notational-fzf-vim'
 
         " Git
         Plug 'tpope/vim-fugitive'
@@ -96,6 +102,8 @@
         " Other filetype stuff
         Plug 'wlangstroth/vim-racket', { 'for': 'racket' }
         Plug 'saltstack/salt-vim', { 'for': 'sls' }
+        Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
+        Plug 'basepi/follow-markdown-links', { 'for': 'markdown' }
 
         " Repeat plugin operations with .
         Plug 'tpope/vim-repeat'
@@ -123,6 +131,9 @@
 
         " Manage tags/quotes/brackets dynamically
         Plug 'tpope/vim-surround'
+
+        " Move between vim/tmux splits seamlessly
+        Plug 'christoomey/vim-tmux-navigator'
 
     call plug#end()
 
@@ -270,7 +281,7 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 "    set equalalways
 
 " When windows are split, new window appears on bottom
-    set splitbelow
+    "set splitbelow " disabled due to bug in netrw
 " When windows are vsplit, new window appears on right
     set splitright
 
@@ -494,14 +505,35 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 "   to get reliant on this.)
     " inoremap jj <Esc>
 
+" Set breakindent for when wrapping is on
+if has('patch-7.4.338')
+    set breakindent
+    set showbreak=••••
+end
+
+" Toggle between wrap and no wrap with <leader>w
+    noremap <silent> <Leader>w :call ToggleWrap()<CR>
+    function ToggleWrap()
+      if &wrap
+        echo "Wrap OFF"
+        setlocal nowrap
+        set virtualedit=all
+      else
+        echo "Wrap ON"
+        setlocal wrap linebreak nolist
+        set virtualedit=
+        setlocal display+=lastline
+      endif
+    endfunction
+
 " Easily toggle between tabs and spaces
     nnoremap <F3> :set expandtab!<CR>
 
 " Easily toggle between line numbers and no line numbers
-    nnoremap <F4> :set number!<CR>
+    nnoremap <F4> :set number!<CR>:set relativenumber!<CR>
 
 " Toggle line numbers and fold column for easy copying via <F2>:
-    nnoremap <F2> :set nonumber!<CR>:set foldcolumn=0<CR>
+    nnoremap <F2> :set nonumber!<CR>:set relativenumber!<CR>:GitGutterToggle<CR>:set foldcolumn=0<CR>
 
 " Move through vim's location lists (for example, syntastic errors)
     nnoremap <leader>j :lnext<CR>
@@ -513,6 +545,26 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
     nnoremap <leader>n :cn<cr>
     nnoremap <leader>N :cp<cr>
     nnoremap <leader>p :cp<cr>
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => netrw
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Shortcut for refresh
+    augroup netrw_mapping
+        autocmd!
+        autocmd filetype netrw call NetrwMapping()
+    augroup END
+
+    function! NetrwMapping()
+        noremap <buffer> <c-r> <c-l>
+    endfunction
+
+" Preview
+    let g:netrw_liststyle=0         " thin (change to 3 for tree)
+    let g:netrw_altv=1              " open files on right
+    let g:netrw_preview=1
+    let g:netrw_winsize=30
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -593,7 +645,7 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 " => vim-gitgutter plugin
 """"""""""""""""""""""""""""""
 " Turn on gutter by default
-    let g:gitgutter_sign_column_always = 1
+    set signcolumn=yes
 
 
 """"""""""""""""""""""""""""""
@@ -623,7 +675,7 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 " => NERDTree plugin
 """"""""""""""""""""""""""""""
 " Map <leader>f to open a NERDTree buffer
-    nnoremap <silent> <leader>f :NERDTreeToggle<CR>
+    nnoremap <silent> <leader>f :call NERDTreeToggleInCurDir()<CR>
 
 " Close vim if nerdtree is the last window open
     autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
@@ -633,6 +685,22 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 """"""""""""""""""""""""""""""
 "  If directory was given as vim startup argument, open NerdTreeTabToggle
     let g:nerdtree_tabs_open_on_console_startup = 2
+" Close after opening a file
+    let NERDTreeQuitOnOpen = 1
+
+" Use NerdTreeFind by default for toggle
+    function! NERDTreeToggleInCurDir()
+        " If NERDTree is open in the current buffer
+        if (exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1)
+            exe ":NERDTreeClose"
+        else
+            if (expand("%:t") != '')
+                exe ":NERDTreeFind"
+            else
+                exe ":NERDTreeToggle"
+            endif
+        endif
+    endfunction
 
 """"""""""""""""""""""""""""""
 " => UltiSnips plugin
@@ -652,6 +720,25 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 """"""""""""""""""""""""""""""
 " Map the undo tree (Gundo) toggle
     nnoremap <c-g> :GundoToggle<CR>
+
+
+""""""""""""""""""""""""""""""
+" => notational-fzf
+""""""""""""""""""""""""""""""
+" Search Path
+    let g:nv_search_paths = ['./']
+" String. Set to '' (the empty string) if you don't want an extension appended by default.
+" Don't forget the dot, unless you don't want one.
+    let g:nv_default_extension = '.md'
+" Shortcut
+    nnoremap <silent> <c-a> :NV<CR>
+" String. Controls how new note window is created.
+    let g:nv_create_note_window = 'e'
+" String. Must be in the form 'ctrl-KEY' or 'alt-KEY'
+    let g:nv_create_note_key = 'ctrl-x'
+" Boolean. If set, will truncate each path element to a single character. If
+" you have colons in your pathname, this will fail. Not set by default.
+    let g:nv_use_short_pathnames = 0
 
 
 """"""""""""""""""""""""""""""
@@ -696,7 +783,7 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
     set completeopt=menuone,longest,preview
 
 " Make sure the current directory is in the python path (for omni-completion)
-python << EOF
+py3 << EOF
 import sys
 import os
 sys.path.append(os.getcwd())

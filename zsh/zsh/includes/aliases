@@ -26,9 +26,20 @@ alias l='ls -la --color=always'
 alias ll='ls -l --color=always'
 alias sl='ls -h --color=always' # In case of screw-ups
 
+# grep
+alias grep='grep --color=auto'
+
 # Sometimes I work on vi-only systems -- this keeps me sane on the switch
 alias vi="vim"
+
+# https://twitter.com/liamosaur/status/506975850596536320
+alias fuck='sudo $(fc -ln -1)'
 
 # LXC Parasite host management
 alias lxcup='VBoxManage startvm "LXC Host" --type headless'
 alias lxcdown='VBoxManage controlvm "LXC Host" poweroff'
+
+alias mustafar='mosh basepi@mustafar.basepi.net -- /home/linuxbrew/.linuxbrew/bin/tmux new-session -A -D -s base'
+alias smustafar='ssh basepi@mustafar.basepi.net -t -- /home/linuxbrew/.linuxbrew/bin/tmux new-session -A -D -s base'
+
+alias ttt='/home/linuxbrew/.linuxbrew/bin/tmux new-session -A -D -s base'
