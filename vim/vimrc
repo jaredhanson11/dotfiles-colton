@@ -645,7 +645,11 @@ end
 " => vim-gitgutter plugin
 """"""""""""""""""""""""""""""
 " Turn on gutter by default
+if exists('&signcolumn')  " Vim 7.4.2201
     set signcolumn=yes
+else
+    let g:gitgutter_sign_column_always = 1
+endif
 
 
 """"""""""""""""""""""""""""""
@@ -781,7 +785,7 @@ end
     set completeopt=menuone,longest,preview
 
 " Make sure the current directory is in the python path (for omni-completion)
-py3 << EOF
+python << EOF
 import sys
 import os
 sys.path.append(os.getcwd())

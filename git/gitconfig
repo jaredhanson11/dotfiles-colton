@@ -1,7 +1,6 @@
 [user]
-    name = Colton Myers
-    email = colton.myers@gmail.com
-	signingkey = 6EC5C787D71F663F
+    name = Jared Hanson
+    email = jred0011@gmail.com
 [color]
     diff = auto
     status = auto
@@ -33,5 +32,3 @@
     keepBackup = false
 [init]
     templatedir = ~/.git_template
-[commit]
-	gpgsign = true
