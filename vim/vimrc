@@ -89,6 +89,9 @@
         Plug 'jmcantrell/vim-virtualenv', { 'for': 'python' }
         Plug 'davidhalter/jedi-vim', { 'for': 'python' }
 
+        " Java
+        Plug 'artur-shaik/vim-javacomplete2'
+
         " Markdown
         Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
         Plug 'JamshedVesuna/vim-markdown-preview'
@@ -331,6 +334,17 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
     set tabstop=4
     set shiftwidth=4
     set softtabstop=4
+" Set tabstop size for filetypes
+"    au Filetype html set tabstop=2
+"    au Filetype html set shiftwidth=2
+"    au Filetype html set softtabstop=2
+"    au Filetype css set tabstop=2
+"    au Filetype css set shiftwidth=2
+"    au Filetype css set softtabstop=2
+"    au Filetype js set tabstop=2
+"    au Filetype js set shiftwidth=2
+"    au Filetype js set softtabstop=2
+
 
 " Expand tabs to <tabstop> spaces instead of \t character
     set expandtab
@@ -722,6 +736,24 @@ endif
 """"""""""""""""""""""""""""""
 " Map the undo tree (Gundo) toggle
     nnoremap <c-g> :GundoToggle<CR>
+
+""""""""""""""""""""""""""""""
+" => Javacomplete plugin
+""""""""""""""""""""""""""""""
+autocmd FileType java setlocal omnifunc=javacomplete#Complete
+
+nmap <F4> <Plug>(JavaComplete-Imports-AddSmart)
+imap <F4> <Plug>(JavaComplete-Imports-AddSmart)
+
+nmap <F5> <Plug>(JavaComplete-Imports-Add)
+imap <F5> <Plug>(JavaComplete-Imports-Add)
+
+nmap <F6> <Plug>(JavaComplete-Imports-AddMissing)
+imap <F6> <Plug>(JavaComplete-Imports-AddMissing)
+
+nmap <F7> <Plug>(JavaComplete-Imports-RemoveUnused)
+imap <F7> <Plug>(JavaComplete-Imports-RemoveUnused)
+
 
 
 """"""""""""""""""""""""""""""
